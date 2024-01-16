@@ -2,7 +2,7 @@
 
 ## Game Logic
 
-Used GitHub Copilot as the AI tool to create starter code.
+Used GitHub Copilot as the AI tool to create starter code. The code from the response passed the tests for `roll_dice` but failed several of the tests for `calculate_score`.
 
 ### Prompt
 
