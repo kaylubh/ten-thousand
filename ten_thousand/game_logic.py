@@ -55,7 +55,7 @@ class GameLogic:
         if len(sorted_rolls_counts) == 6: # if six unique values rolled must be full house
             score = 1500
 
-        # scores a three pairs
+        # scores three pairs
         if len(sorted_rolls_counts) == 3: # three unique values rolled
             if sorted_rolls_counts[0][1] == 2 and sorted_rolls_counts[1][1] == 2: # all are pairs
                 score = 1500
