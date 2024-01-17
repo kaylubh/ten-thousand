@@ -1,27 +1,47 @@
 import random
+from collections import Counter
 
 class GameLogic:
+
     @staticmethod
-    def calculate_score(roll):
+    def calculate_score(rolls):
+        totaled_rolls_counts = Counter(rolls) # Counter({value: rolls, value: rolls})
+        sorted_rolls_counts = totaled_rolls_counts.most_common() # [(value, rolls), (value, rolls)] sorted
+
         score = 0
-        counts = [0] * 7
-        for die in roll:
-            counts[die] += 1
 
-        # Calculate score for each die value
-        for i in range(1, 7):
-            count = counts[i]
-            if count >= 3:
-                if i == 1:
-                    score += 1000
+        for roll_count in sorted_rolls_counts:
+            value = roll_count[0]
+            count = roll_count[1]
+
+            # all 1's
+            if value == 1:
+                if count < 3:
+                    score += 100 * count
                 else:
-                    score += i * 100
-                count -= 3
+                    multiplier = 1000 * (count - 3)
+                    score += 1000 + multiplier
 
-            if i == 1:
-                score += count * 100
-            elif i == 5:
-                score += count * 50
+            # 1-2 count of 5's
+            if value == 5:
+                if count < 3:
+                    score += 50 * count
+
+            # 3-6 of a kind excluding 1's        
+            if value != 1:
+                if count >= 3:
+                    three_of_a_kind_score = value * 100
+                    multiplier = three_of_a_kind_score * (count - 3)
+                    score += three_of_a_kind_score + multiplier
+
+        # full house
+        if len(sorted_rolls_counts) == 6:
+            score = 1500
+
+        # three pairs
+        if len(sorted_rolls_counts) == 3:
+            if sorted_rolls_counts[0][1] == 2 and sorted_rolls_counts[1][1] == 2:
+                score = 1500
 
         return score
 
