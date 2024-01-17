@@ -21,16 +21,17 @@ class GameLogic:
         Returns:
         integer: The highest possible score from the input rolls.
         """
-        totaled_rolls_counts = Counter(rolls) # Counter({value: rolls, value: rolls})
-        sorted_rolls_counts = totaled_rolls_counts.most_common() # [(value, rolls), (value, rolls)] sorted
+
+        totaled_rolls_counts = Counter(rolls) # Counter({value: count, value: count})
+        sorted_rolls_counts = totaled_rolls_counts.most_common() # [(value, count), (value, count)] sorted
 
         score = 0
 
         for roll_count in sorted_rolls_counts:
-            value = roll_count[0]
-            count = roll_count[1]
+            value = roll_count[0] # value of the dice (1, 2, 3, 4, 5, 6)
+            count = roll_count[1] # count of times the value was rolled
 
-            # all 1's
+            # scores all "1" values
             if value == 1:
                 if count < 3:
                     score += 100 * count
@@ -38,25 +39,25 @@ class GameLogic:
                     multiplier = 1000 * (count - 3)
                     score += 1000 + multiplier
 
-            # 1-2 count of 5's
+            # scores "5" values if count is 1 or 2
             if value == 5:
                 if count < 3:
                     score += 50 * count
 
-            # three-six of a kind excluding 1's        
+            # scores all values except "1" for three, four, five, or six of a kind      
             if value != 1:
                 if count >= 3:
                     three_of_a_kind_score = value * 100
                     multiplier = three_of_a_kind_score * (count - 3)
                     score += three_of_a_kind_score + multiplier
 
-        # full house
-        if len(sorted_rolls_counts) == 6:
+        # scores a full house
+        if len(sorted_rolls_counts) == 6: # if six unique values rolled must be full house
             score = 1500
 
-        # three pairs
-        if len(sorted_rolls_counts) == 3:
-            if sorted_rolls_counts[0][1] == 2 and sorted_rolls_counts[1][1] == 2:
+        # scores a three pairs
+        if len(sorted_rolls_counts) == 3: # three unique values rolled
+            if sorted_rolls_counts[0][1] == 2 and sorted_rolls_counts[1][1] == 2: # all are pairs
                 score = 1500
 
         return score
@@ -72,4 +73,5 @@ class GameLogic:
         Returns:
         tuple: The values of the "rolled" dice.
         """
+
         return tuple(random.randint(1, 6) for _ in range(num_dice))
