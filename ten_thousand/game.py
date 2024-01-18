@@ -2,7 +2,14 @@ from ten_thousand.game_logic import GameLogic
 
 def get_input(*valid_input, dice_input = False):
     """
-    
+    Gets input from the user then validates, formats, and returns the input.
+
+    Parameters:
+    *valid_input (strings): a variable number of valid user inputs to check against, will prompt user for input until their response matches a valid input
+    dice_input (boolean)(default = False): if passed a True argument, validates and formats the user input using the dice input conditions instead of default
+
+    Returns:
+    string: user input
     """
 
     response = input("> ")
@@ -21,7 +28,13 @@ def get_input(*valid_input, dice_input = False):
 
 def roll_dice(num_dice):
     """
-    
+    Uses the GameLogic class to simulate rolling a given number of dice.
+
+    Parameters:
+    num_dice (integer): the number of dice to roll
+
+    Returns:
+    string: formatted string representing the rolled dice
     """
 
     rolled_dice = GameLogic.roll_dice(num_dice)
@@ -33,7 +46,13 @@ def roll_dice(num_dice):
 
 def get_score(dice_to_score_string):
     """
-    
+    Uses the GameLogic class to calculate the score from a given dice roll.
+
+    Parameters:
+    dice_to_score_string (string): a string of numbers representing the dice roll values to score
+
+    Returns:
+    integer: the calculated score from the input dice roll
     """
 
     dice_to_score_strings = list(dice_to_score_string)
@@ -45,7 +64,7 @@ def get_score(dice_to_score_string):
 
 def game_session():
     """
-    
+    Logic for running a game session. Manages the turns, score-keeping, and completion of a game.
     """
 
     round = 1
@@ -94,7 +113,7 @@ def game_session():
 
 def play():
     """
-    
+    Begins the game on run. Depending on user input, begins a game session or exits the program.
     """
 
     welcome_message = "Welcome to Ten Thousand"
