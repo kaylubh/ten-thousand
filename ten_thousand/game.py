@@ -26,7 +26,7 @@ def get_input(*valid_input, dice_input = False):
         print("Invalid input. Enter a character in () from above.")
         get_input(*valid_input)
 
-def roll_dice(num_dice):
+def roll_dice(num_dice, roller):
     """
     Uses the GameLogic class to simulate rolling a given number of dice.
 
@@ -37,7 +37,8 @@ def roll_dice(num_dice):
     string: formatted string representing the rolled dice
     """
 
-    rolled_dice = GameLogic.roll_dice(num_dice)
+    roll_engine = roller or GameLogic.roll_dice
+    rolled_dice = roll_engine(num_dice)
 
     # formats rolled dice values into a string to be rendered
     rolled_dice_string = " ".join(str(_) for _ in rolled_dice)
@@ -64,7 +65,7 @@ def get_score(dice_to_score_string):
 
     return score
 
-def game_session():
+def game_session(roller):
     """
     Logic for running a game session. Manages the turns, score-keeping, and completion of a game.
     """
@@ -79,7 +80,7 @@ def game_session():
         # begin round
         print(f"Starting round {round}")
         print(f"Rolling {dice} dice...")
-        print(roll_dice(dice))
+        print(roll_dice(dice, roller))
         print("Enter dice to keep, or (q)uit:")
 
         # prompt user to score dice for current turn or quit
@@ -123,7 +124,7 @@ def game_session():
 
                 continue_game = False
 
-def play():
+def play(roller = None):
     """
     Begins the game on run. Depending on user input, begins a game session or exits the program.
     """
@@ -138,7 +139,7 @@ def play():
     response = get_input("y", "n")
 
     if response == "y":
-        game_session()
+        game_session(roller)
     elif response == "n":
         print("OK. Maybe another time")
 
