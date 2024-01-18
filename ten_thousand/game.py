@@ -92,7 +92,7 @@ def game_session():
 
                 continue_game = False
 
-def welcome():
+def play():
     """
     
     """
@@ -109,9 +109,6 @@ def welcome():
         game_session()
     elif response == "n":
         print("OK. Maybe another time")
-
-def play():
-    welcome()
 
 
 ################
