@@ -40,13 +40,11 @@ class GameLogic:
                     score += 1000 + multiplier
 
             # scores "5" values if count is 1 or 2
-            if value == 5:
-                if count < 3:
+            if value == 5 and count < 3:
                     score += 50 * count
 
             # scores all values except "1" for three, four, five, or six of a kind      
-            if value != 1:
-                if count >= 3:
+            if value != 1 and count >= 3:
                     three_of_a_kind_score = value * 100
                     multiplier = three_of_a_kind_score * (count - 3)
                     score += three_of_a_kind_score + multiplier
