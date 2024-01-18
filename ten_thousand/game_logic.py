@@ -50,7 +50,7 @@ class GameLogic:
                     score += three_of_a_kind_score + multiplier
 
         # scores a full house
-        if len(sorted_rolls_counts) == 6: # if six unique values rolled must be full house
+        if len(sorted_rolls_counts) == 6: # six unique values rolled must be full house
             score = 1500
 
         # scores three pairs
@@ -73,3 +73,39 @@ class GameLogic:
         """
 
         return tuple(random.randint(1, 6) for _ in range(num_dice))
+    
+    @staticmethod
+    def get_scorers(rolls):
+        """
+        
+        """
+
+        totaled_rolls_counts = Counter(rolls) # Counter({value: count, value: count})
+        sorted_rolls_counts = totaled_rolls_counts.most_common() # [(value, count), (value, count)] sorted
+
+        # check for full house
+        if len(sorted_rolls_counts) == 6: # six unique values rolled must be full house
+            return rolls
+
+        # check for three pairs
+        if len(sorted_rolls_counts) == 3: # three unique values rolled
+             if sorted_rolls_counts[0][1] == 2 and sorted_rolls_counts[1][1] == 2: # all are pairs
+                  return rolls
+
+        scorers = []
+
+        # add "1" to scorers
+        scorers += [roll for roll in rolls if roll == 1]
+
+        # add "5" to scorers
+        scorers += [roll for roll in rolls if roll == 5]
+
+        # add three, four, five, or six of a kind scorers
+        for roll_count in sorted_rolls_counts:
+            value = roll_count[0] # value of the dice (1, 2, 3, 4, 5, 6)
+            count = roll_count[1] # count of times the value was rolled
+
+            if value != 1 and value != 5 and count >= 3:
+                scorers += [roll for roll in rolls if roll == value]
+
+        return scorers
