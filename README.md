@@ -24,8 +24,8 @@
 
 #### Run
 
-This project does not currently run (YET!).
+From root of project directory run `python -m ten_thousand.game`.
 
 #### Tests
 
-From root of project directory run `pytest`
+From root of project directory run `pytest -m version_1`
