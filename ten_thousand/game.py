@@ -1,6 +1,6 @@
 from ten_thousand.game_logic import GameLogic
 
-def get_input(*valid_input, dice_input = False):
+def get_input(*valid_input, dice_rolls = None, dice_input = False):
     """
     Gets input from the user then validates, formats, and returns the input.
 
@@ -30,7 +30,18 @@ def get_input(*valid_input, dice_input = False):
             dice_to_score_strings = list(response)
             dice_to_score_integers = tuple(int(_) for _ in dice_to_score_strings)
 
+            # checks for legal input compared to dice rolls
+            # rolls = tuple(valid_input)
+            # print(rolls)
+            # is_legal = GameLogic.validate_keepers(rolls, dice_to_score_integers)
+
+            # if is_legal:
             return dice_to_score_integers
+            
+            # else:
+            #     print("Cheater!!! Or possibly made a typo...")
+            #     # print(dice_rolls)
+            #     get_input(*valid_input, dice_rolls, dice_input)
 
     # check response for valid input
     if response in valid_input:
@@ -88,7 +99,7 @@ def game_turn(num_dice, roller):
 
     # prompt user to score dice for current turn or quit
     print("Enter dice to keep, or (q)uit:")
-    response = get_input(rolls, dice_input = True)
+    response = get_input(rolls, rolls_string, dice_input = True)
 
     return response
 
