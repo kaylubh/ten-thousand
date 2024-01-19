@@ -75,30 +75,30 @@ class GameLogic:
         return tuple(random.randint(1, 6) for _ in range(num_dice))
     
     @staticmethod
-    def get_scorers(rolls):
+    def get_scorers(roll_values):
         """
         
         """
 
-        totaled_rolls_counts = Counter(rolls) # Counter({value: count, value: count})
+        totaled_rolls_counts = Counter(roll_values) # Counter({value: count, value: count})
         sorted_rolls_counts = totaled_rolls_counts.most_common() # [(value, count), (value, count)] sorted
 
         # check for full house
         if len(sorted_rolls_counts) == 6: # six unique values rolled must be full house
-            return rolls
+            return roll_values
 
         # check for three pairs
         if len(sorted_rolls_counts) == 3: # three unique values rolled
              if sorted_rolls_counts[0][1] == 2 and sorted_rolls_counts[1][1] == 2: # all are pairs
-                  return rolls
+                  return roll_values
 
         scorers = []
 
         # add "1" to scorers
-        scorers += [roll for roll in rolls if roll == 1]
+        scorers += [roll_value for roll_value in roll_values if roll_value == 1]
 
         # add "5" to scorers
-        scorers += [roll for roll in rolls if roll == 5]
+        scorers += [roll_value for roll_value in roll_values if roll_value == 5]
 
         # add three, four, five, or six of a kind scorers
         for roll_count in sorted_rolls_counts:
@@ -106,6 +106,29 @@ class GameLogic:
             count = roll_count[1] # count of times the value was rolled
 
             if value != 1 and value != 5 and count >= 3:
-                scorers += [roll for roll in rolls if roll == value]
+                scorers += [roll_value for roll_value in roll_values if roll_value == value]
 
-        return scorers
+        return tuple(scorers)
+
+    @staticmethod
+    def validate_keepers(roll_values, selected_dice):
+        """
+        
+        """
+
+        legal_selection = True
+
+        # compare roll values to the selected dice for legal selections
+        roll_counts = Counter(roll_values) # Counter({value: count, value: count})
+        selected_counts = Counter(selected_dice)
+        
+        for selected in selected_counts:
+            # selected dice value is in the roll
+            legal_selection = selected in roll_counts
+
+            # run this check only if first test passes
+            if legal_selection:
+                # the number of a value of selected dice is <= the number of a value in the roll
+                legal_selection = selected_counts[selected] <= roll_counts[selected]
+
+        return legal_selection
