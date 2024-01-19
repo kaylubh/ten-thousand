@@ -37,6 +37,7 @@ def roll_dice(num_dice, roller):
     string: formatted string representing the rolled dice
     """
 
+    # roll the dice or use simulated rolls for tests
     roll_engine = roller or GameLogic.roll_dice
     rolled_dice = roll_engine(num_dice)
 
@@ -65,39 +66,46 @@ def get_score(dice_to_score_string):
 
     return score
 
-def game_session(roller):
+def game_turn(num_dice, roller):
     """
-    Logic for running a game session. Manages the turns, score-keeping, and completion of a game.
+    
     """
 
-    round = 1
-    dice = 6
-    total_score = 0
+    print(f"Rolling {num_dice} dice...")
+    print(roll_dice(num_dice, roller))
+    print("Enter dice to keep, or (q)uit:")
+
+    # prompt user to score dice for current turn or quit
+    response = get_input(dice_input = True)
+
+    return response
+
+def game_round(round, roller):
+    """
+    
+    """
+
+    num_dice = 6
     round_score = 0
-    continue_game = True
+    continue_round = True
 
-    while continue_game:
-        # begin round
-        print(f"Starting round {round}")
-        print(f"Rolling {dice} dice...")
-        print(roll_dice(dice, roller))
-        print("Enter dice to keep, or (q)uit:")
+    # begin round
+    print(f"Starting round {round}")
 
-        # prompt user to score dice for current turn or quit
-        response = get_input(dice_input = True)
-        
+    while continue_round:
+
+        turn_response = game_turn(num_dice, roller)
+
         # quit game
-        if response == "q":
-            print(f"Thanks for playing. You earned {total_score} points")
-
-            continue_game = False
-
+        if turn_response == "q":
+            return "q"
+        
         # score user selected dice
         else:
-            round_score += get_score(response)
-            dice -= len(response)
+            round_score += get_score(turn_response)
+            num_dice -= len(turn_response)
 
-            print(f"You have {round_score} unbanked points and {dice} dice remaining")
+            print(f"You have {round_score} unbanked points and {num_dice} dice remaining")
             print("(r)oll again, (b)ank your points or (q)uit:")
             
             # prompt user to take another turn, bank score and begin new round, or quit game
@@ -106,23 +114,43 @@ def game_session(roller):
             # take another turn
             if continue_response == "r":
                 pass # TODO
-            
-            # bank current score and begin next round
-            elif continue_response == "b":
-                total_score += round_score
 
-                print(f"You banked {round_score} points in round {round}")
-                print(f"Total score is {total_score} points")
-
-                round += 1
-                dice = 6
-                round_score = 0
+            # bank score
+            if continue_response == "b":
+                return "b", round_score
             
             # quit game
-            elif continue_response == "q":
-                print(f"Thanks for playing. You earned {total_score} points")
+            if continue_response == "q":
+                return "q"
 
-                continue_game = False
+def game_session(roller):
+    """
+    Logic for running a game session. Manages the turns, score-keeping, and completion of a game.
+    """
+
+    round = 1
+    total_score = 0
+    continue_game = True
+
+    while continue_game:
+
+        round_response = game_round(round, roller)
+            
+        # bank current score and begin next round
+        if round_response[0] == "b":
+            round_score = round_response[1]
+            total_score += round_score
+
+            print(f"You banked {round_score} points in round {round}")
+            print(f"Total score is {total_score} points")
+
+            round += 1
+            
+        # quit game
+        elif round_response[0] == "q":
+            print(f"Thanks for playing. You earned {total_score} points")
+
+            continue_game = False
 
 def play(roller = None):
     """
