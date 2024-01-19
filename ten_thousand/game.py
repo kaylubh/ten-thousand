@@ -176,7 +176,7 @@ def game_session(roller):
         round_response, round_score = game_round(round, roller)
             
         # end round and begin next round on bank or zilch
-        if round_response == "b" or "z":
+        if round_response == "b" or round_response == "z":
             total_score += round_score
 
             print(f"You banked {round_score} points in round {round}")
@@ -189,6 +189,8 @@ def game_session(roller):
             print(f"Thanks for playing. You earned {total_score} points")
 
             continue_game = False
+            
+    return
 
 def play(roller = None):
     """
