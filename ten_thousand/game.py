@@ -171,6 +171,10 @@ def game_session(roller):
     total_score = 0
     continue_game = True
 
+    # end game after 10 rounds or getting a score of 10000
+    if round > 10 or total_score >= 10000:
+        continue_game = False
+
     while continue_game:
 
         round_response, round_score = game_round(round, roller)
@@ -189,8 +193,6 @@ def game_session(roller):
             print(f"Thanks for playing. You earned {total_score} points")
 
             continue_game = False
-            
-    return
 
 def play(roller = None):
     """
