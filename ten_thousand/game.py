@@ -97,6 +97,14 @@ def game_turn(num_dice, roller):
     print(f"Rolling {num_dice} dice...")
     print(rolls_string)
 
+    # check for zilch
+    possible_scorers = GameLogic.get_scorers(rolls)
+    if len(possible_scorers) == 0:
+        print("****************************************")
+        print("**        Zilch!!! Round over         **")
+        print("****************************************")
+        return "z"
+
     # prompt user to score dice for current turn or quit
     print("Enter dice to keep, or (q)uit:")
     response = get_input(rolls, rolls_string, dice_input = True)
@@ -121,7 +129,11 @@ def game_round(round, roller):
 
         # quit game
         if turn_response == "q":
-            return "q"
+            return "q", 0
+        
+        # on zilch, end round
+        if turn_response == "z":
+            return "z", 0
         
         # score user selected dice
         else:
@@ -148,7 +160,7 @@ def game_round(round, roller):
             
             # quit game
             if continue_response == "q":
-                return "q"
+                return "q", 0
 
 def game_session(roller):
     """
@@ -161,11 +173,10 @@ def game_session(roller):
 
     while continue_game:
 
-        round_response = game_round(round, roller)
+        round_response, round_score = game_round(round, roller)
             
-        # bank current score and begin next round
-        if round_response[0] == "b":
-            round_score = round_response[1]
+        # end round and begin next round on bank or zilch
+        if round_response == "b" or "z":
             total_score += round_score
 
             print(f"You banked {round_score} points in round {round}")
@@ -174,7 +185,7 @@ def game_session(roller):
             round += 1
             
         # quit game
-        elif round_response[0] == "q":
+        elif round_response == "q":
             print(f"Thanks for playing. You earned {total_score} points")
 
             continue_game = False
