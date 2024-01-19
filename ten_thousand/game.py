@@ -17,7 +17,20 @@ def get_input(*valid_input, dice_input = False):
 
     # handle dice input
     if dice_input:
-        return response.replace(" ", "")
+        # quit game
+        if response == "q":
+            return response
+        
+        # dice input
+        else:
+            # removes spaces
+            response = response.replace(" ", "")
+
+            # converts the input from a string to a tuple of integers
+            dice_to_score_strings = list(response)
+            dice_to_score_integers = tuple(int(_) for _ in dice_to_score_strings)
+
+            return dice_to_score_integers
 
     # check response for valid input
     if response in valid_input:
@@ -45,9 +58,9 @@ def roll_dice(num_dice, roller):
     rolled_dice_string = " ".join(str(_) for _ in rolled_dice)
     rolled_dice_display = f"*** {rolled_dice_string} ***"
 
-    return rolled_dice_display
+    return rolled_dice, rolled_dice_display
 
-def get_score(dice_to_score_string):
+def get_score(dice_to_score):
     """
     Uses the GameLogic class to calculate the score from a given dice roll.
 
@@ -58,11 +71,7 @@ def get_score(dice_to_score_string):
     integer: the calculated score from the input dice roll
     """
 
-    # converts the input from a string to a tuple of integers
-    dice_to_score_strings = list(dice_to_score_string)
-    dice_to_score_integers = tuple(int(_) for _ in dice_to_score_strings)
-
-    score = GameLogic.calculate_score(dice_to_score_integers)
+    score = GameLogic.calculate_score(dice_to_score)
 
     return score
 
@@ -71,12 +80,15 @@ def game_turn(num_dice, roller):
     
     """
 
+    # roll dice
+    rolls, rolls_string = roll_dice(num_dice, roller)
+
     print(f"Rolling {num_dice} dice...")
-    print(roll_dice(num_dice, roller))
-    print("Enter dice to keep, or (q)uit:")
+    print(rolls_string)
 
     # prompt user to score dice for current turn or quit
-    response = get_input(dice_input = True)
+    print("Enter dice to keep, or (q)uit:")
+    response = get_input(rolls, dice_input = True)
 
     return response
 
@@ -105,6 +117,10 @@ def game_round(round, roller):
             round_score += get_score(turn_response)
             num_dice -= len(turn_response)
 
+            # check for hot dice
+            if num_dice == 0:
+                num_dice = 6
+
             print(f"You have {round_score} unbanked points and {num_dice} dice remaining")
             print("(r)oll again, (b)ank your points or (q)uit:")
             
@@ -113,7 +129,7 @@ def game_round(round, roller):
 
             # take another turn
             if continue_response == "r":
-                pass # TODO
+                pass
 
             # bank score
             if continue_response == "b":
