@@ -28,4 +28,4 @@ From root of project directory run `python -m ten_thousand.game`.
 
 #### Tests
 
-From root of project directory run `pytest -m version_1`
+From root of project directory run `pytest`
