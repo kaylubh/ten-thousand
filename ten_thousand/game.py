@@ -1,6 +1,6 @@
 from ten_thousand.game_logic import GameLogic
 
-def get_input(*valid_input, dice_input = False):
+def get_input(*valid_input):
     """
     Gets input from the user then validates, formats, and returns the input.
 
@@ -14,10 +14,7 @@ def get_input(*valid_input, dice_input = False):
 
     response = input("> ")
     response = response.lower()
-
-    # handle dice input
-    if dice_input:
-        return response.replace(" ", "")
+    response = response.replace(" ", "") # removes spaces
 
     # check response for valid input
     if response in valid_input:
@@ -26,7 +23,37 @@ def get_input(*valid_input, dice_input = False):
         print("Invalid input. Enter a character in () from above.")
         get_input(*valid_input)
 
-def roll_dice(num_dice):
+def get_dice_input(dice_rolls, dice_rolls_string):
+    """
+    
+    """
+
+    response = input("> ")
+    response = response.lower()
+    response = response.replace(" ", "") # removes spaces
+
+        # quit game
+    if response == "q":
+        return response
+        
+    # dice input
+    else:
+        # converts the input from a string to a tuple of integers
+        dice_to_score_strings = list(response)
+        dice_to_score_integers = tuple(int(str) for str in dice_to_score_strings)
+
+        # checks for legal input compared to dice rolls
+        is_legal = GameLogic.validate_keepers(dice_rolls, dice_to_score_integers)
+
+        if is_legal:
+            return dice_to_score_integers
+            
+        else:
+            print("Cheater!!! Or possibly made a typo...")
+            print(dice_rolls_string)
+            get_dice_input(dice_rolls, dice_rolls_string)
+
+def roll_dice(num_dice, roller):
     """
     Uses the GameLogic class to simulate rolling a given number of dice.
 
@@ -37,15 +64,17 @@ def roll_dice(num_dice):
     string: formatted string representing the rolled dice
     """
 
-    rolled_dice = GameLogic.roll_dice(num_dice)
+    # roll the dice or use simulated rolls for tests
+    roll_engine = roller or GameLogic.roll_dice
+    rolled_dice = roll_engine(num_dice)
 
     # formats rolled dice values into a string to be rendered
-    rolled_dice_string = " ".join(str(_) for _ in rolled_dice)
+    rolled_dice_string = " ".join(str(dice) for dice in rolled_dice)
     rolled_dice_display = f"*** {rolled_dice_string} ***"
 
-    return rolled_dice_display
+    return rolled_dice, rolled_dice_display
 
-def get_score(dice_to_score_string):
+def get_score(dice_to_score):
     """
     Uses the GameLogic class to calculate the score from a given dice roll.
 
@@ -56,47 +85,70 @@ def get_score(dice_to_score_string):
     integer: the calculated score from the input dice roll
     """
 
-    # converts the input from a string to a tuple of integers
-    dice_to_score_strings = list(dice_to_score_string)
-    dice_to_score_integers = tuple(int(_) for _ in dice_to_score_strings)
-
-    score = GameLogic.calculate_score(dice_to_score_integers)
+    score = GameLogic.calculate_score(dice_to_score)
 
     return score
 
-def game_session():
+def game_turn(num_dice, roller):
     """
-    Logic for running a game session. Manages the turns, score-keeping, and completion of a game.
+    
     """
 
-    round = 1
-    dice = 6
-    total_score = 0
+    # roll dice
+    rolls, rolls_string = roll_dice(num_dice, roller)
+
+    print(f"Rolling {num_dice} dice...")
+    print(rolls_string)
+
+    # check for zilch
+    possible_scorers = GameLogic.get_scorers(rolls)
+
+    if len(possible_scorers) == 0:
+        print("****************************************")
+        print("**        Zilch!!! Round over         **")
+        print("****************************************")
+        return "z"
+
+    # prompt user to score dice for current turn or quit
+    print("Enter dice to keep, or (q)uit:")
+    response = get_dice_input(rolls, rolls_string)
+
+    return response
+
+def game_round(round, roller):
+    """
+    
+    """
+
+    num_dice = 6
     round_score = 0
-    continue_game = True
+    continue_round = True
 
-    while continue_game:
-        # begin round
-        print(f"Starting round {round}")
-        print(f"Rolling {dice} dice...")
-        print(roll_dice(dice))
-        print("Enter dice to keep, or (q)uit:")
+    # begin round
+    print(f"Starting round {round}")
 
-        # prompt user to score dice for current turn or quit
-        response = get_input(dice_input = True)
-        
+    while continue_round:
+
+        turn_response = game_turn(num_dice, roller)
+
         # quit game
-        if response == "q":
-            print(f"Thanks for playing. You earned {total_score} points")
-
-            continue_game = False
-
+        if turn_response == "q":
+            return "q", 0
+        
+        # on zilch, end round
+        if turn_response == "z":
+            return "z", 0
+        
         # score user selected dice
         else:
-            round_score += get_score(response)
-            dice -= len(response)
+            round_score += get_score(turn_response)
+            num_dice -= len(turn_response)
 
-            print(f"You have {round_score} unbanked points and {dice} dice remaining")
+            # check for hot dice
+            if num_dice == 0:
+                num_dice = 6
+
+            print(f"You have {round_score} unbanked points and {num_dice} dice remaining")
             print("(r)oll again, (b)ank your points or (q)uit:")
             
             # prompt user to take another turn, bank score and begin new round, or quit game
@@ -104,26 +156,49 @@ def game_session():
 
             # take another turn
             if continue_response == "r":
-                pass # TODO
-            
-            # bank current score and begin next round
-            elif continue_response == "b":
-                total_score += round_score
+                pass
 
-                print(f"You banked {round_score} points in round {round}")
-                print(f"Total score is {total_score} points")
-
-                round += 1
-                dice = 6
-                round_score = 0
+            # bank score
+            if continue_response == "b":
+                return "b", round_score
             
             # quit game
-            elif continue_response == "q":
-                print(f"Thanks for playing. You earned {total_score} points")
+            if continue_response == "q":
+                return "q", 0
 
-                continue_game = False
+def game_session(roller):
+    """
+    Logic for running a game session. Manages the turns, score-keeping, and completion of a game.
+    """
 
-def play():
+    round = 1
+    total_score = 0
+    continue_game = True
+
+    # end game after 10 rounds or getting a score of 10000
+    if round > 10 or total_score >= 10000:
+        continue_game = False
+
+    while continue_game:
+
+        round_response, round_score = game_round(round, roller)
+            
+        # end round and begin next round on bank or zilch
+        if round_response == "b" or round_response == "z":
+            total_score += round_score
+
+            print(f"You banked {round_score} points in round {round}")
+            print(f"Total score is {total_score} points")
+
+            round += 1
+            
+        # quit game
+        elif round_response == "q":
+            print(f"Thanks for playing. You earned {total_score} points")
+
+            continue_game = False
+
+def play(roller = None):
     """
     Begins the game on run. Depending on user input, begins a game session or exits the program.
     """
@@ -138,7 +213,7 @@ def play():
     response = get_input("y", "n")
 
     if response == "y":
-        game_session()
+        game_session(roller)
     elif response == "n":
         print("OK. Maybe another time")
 
