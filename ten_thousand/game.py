@@ -1,6 +1,6 @@
 from ten_thousand.game_logic import GameLogic
 
-def get_input(*valid_input, dice_rolls = None, dice_input = False):
+def get_input(*valid_input):
     """
     Gets input from the user then validates, formats, and returns the input.
 
@@ -14,34 +14,7 @@ def get_input(*valid_input, dice_rolls = None, dice_input = False):
 
     response = input("> ")
     response = response.lower()
-
-    # handle dice input
-    if dice_input:
-        # quit game
-        if response == "q":
-            return response
-        
-        # dice input
-        else:
-            # removes spaces
-            response = response.replace(" ", "")
-
-            # converts the input from a string to a tuple of integers
-            dice_to_score_strings = list(response)
-            dice_to_score_integers = tuple(int(_) for _ in dice_to_score_strings)
-
-            # checks for legal input compared to dice rolls
-            # rolls = tuple(valid_input)
-            # print(rolls)
-            # is_legal = GameLogic.validate_keepers(rolls, dice_to_score_integers)
-
-            # if is_legal:
-            return dice_to_score_integers
-            
-            # else:
-            #     print("Cheater!!! Or possibly made a typo...")
-            #     # print(dice_rolls)
-            #     get_input(*valid_input, dice_rolls, dice_input)
+    response = response.replace(" ", "") # removes spaces
 
     # check response for valid input
     if response in valid_input:
@@ -49,6 +22,36 @@ def get_input(*valid_input, dice_rolls = None, dice_input = False):
     else:
         print("Invalid input. Enter a character in () from above.")
         get_input(*valid_input)
+
+def get_dice_input(dice_rolls, dice_rolls_string):
+    """
+    
+    """
+
+    response = input("> ")
+    response = response.lower()
+    response = response.replace(" ", "") # removes spaces
+
+        # quit game
+    if response == "q":
+        return response
+        
+    # dice input
+    else:
+        # converts the input from a string to a tuple of integers
+        dice_to_score_strings = list(response)
+        dice_to_score_integers = tuple(int(str) for str in dice_to_score_strings)
+
+        # checks for legal input compared to dice rolls
+        is_legal = GameLogic.validate_keepers(dice_rolls, dice_to_score_integers)
+
+        if is_legal:
+            return dice_to_score_integers
+            
+        else:
+            print("Cheater!!! Or possibly made a typo...")
+            print(dice_rolls_string)
+            get_dice_input(dice_rolls, dice_rolls_string)
 
 def roll_dice(num_dice, roller):
     """
@@ -66,7 +69,7 @@ def roll_dice(num_dice, roller):
     rolled_dice = roll_engine(num_dice)
 
     # formats rolled dice values into a string to be rendered
-    rolled_dice_string = " ".join(str(_) for _ in rolled_dice)
+    rolled_dice_string = " ".join(str(dice) for dice in rolled_dice)
     rolled_dice_display = f"*** {rolled_dice_string} ***"
 
     return rolled_dice, rolled_dice_display
@@ -99,6 +102,7 @@ def game_turn(num_dice, roller):
 
     # check for zilch
     possible_scorers = GameLogic.get_scorers(rolls)
+
     if len(possible_scorers) == 0:
         print("****************************************")
         print("**        Zilch!!! Round over         **")
@@ -107,7 +111,7 @@ def game_turn(num_dice, roller):
 
     # prompt user to score dice for current turn or quit
     print("Enter dice to keep, or (q)uit:")
-    response = get_input(rolls, rolls_string, dice_input = True)
+    response = get_dice_input(rolls, rolls_string)
 
     return response
 
